@@ -1,22 +1,21 @@
-$OpenBSD: patch-include_private_gcconfig_h,v 1.22 2017/04/15 14:02:46 naddy Exp $
+$OpenBSD: patch-include_private_gcconfig_h,v 1.23 2019/05/14 10:42:00 ivmai Exp $
 
 - All OpenBSD mips platforms are 64-bit, so correct the wordsize and alignment
 - use __data_start instead of _fdata on OpenBSD/mips64
 - add support for OpenBSD/aarch64
 
---- include/private/gcconfig.h.orig	Tue Aug  2 21:36:14 2016
-+++ include/private/gcconfig.h	Fri Apr 14 17:44:40 2017
-@@ -102,7 +102,8 @@
- # endif
+--- include/private/gcconfig.h.orig	Tue May 14 00:01:00 2019
++++ include/private/gcconfig.h	Tue May 14 10:40:00 2019
+@@ -115,7 +115,7 @@
  # if defined(__aarch64__)
  #    define AARCH64
--#    if !defined(LINUX) && !defined(DARWIN) && !defined(FREEBSD)
-+#    if !defined(LINUX) && !defined(DARWIN) && !defined(FREEBSD) \
-+	&& !defined(OPENBSD)
+ #    if !defined(LINUX) && !defined(DARWIN) && !defined(FREEBSD) \
+-        && !defined(NETBSD)
++        && !defined(NETBSD) && !defined(OPENBSD)
  #      define NOSYS
  #      define mach_type_known
  #    endif
-@@ -137,6 +138,10 @@
+@@ -150,6 +150,10 @@
  #    define ARM32
  #    define mach_type_known
  # endif
@@ -27,30 +26,31 @@ $OpenBSD: patch-include_private_gcconfig_h,v 1.22 2017/04/15 14:02:46 naddy Exp 
  # if defined(OPENBSD) && defined(__sh__)
  #    define SH
  #    define mach_type_known
-@@ -1712,14 +1717,15 @@
+@@ -1742,7 +1746,8 @@
  #  endif
  #  ifdef OPENBSD
- #    define OS_TYPE "OPENBSD"
--#    define ALIGNMENT 4
-+#    define CPP_WORDSZ 64
-+#    define ALIGNMENT 8
+ #     define OS_TYPE "OPENBSD"
+-#     define ALIGNMENT 4
++#     define CPP_WORDSZ 64
++#     define ALIGNMENT 8
  #     ifndef GC_OPENBSD_THREADS
- #      include <sys/param.h>
- #      include <uvm/uvm_extern.h>
- #      define STACKBOTTOM ((ptr_t)USRSTACK)
- #    endif
--     extern int _fdata[];
--#    define DATASTART ((ptr_t)_fdata)
-+     extern int __data_start[];
-+#    define DATASTART ((ptr_t)__data_start)
-      extern int _end[];
- #    define DATAEND ((ptr_t)(&_end))
- #    define DYNAMIC_LOADING
-@@ -2165,6 +2171,19 @@
-       extern char etext[];
- #     define DATASTART GC_FreeBSDGetDataStart(0x1000, (ptr_t)etext)
- #     define DATASTART_USES_BSDGETDATASTART
-+#   endif
+ #       include <sys/param.h>
+ #       include <uvm/uvm_extern.h>
+@@ -1752,8 +1757,8 @@
+ #         define HEURISTIC2
+ #       endif
+ #     endif
+-      extern int _fdata[];
+-#     define DATASTART ((ptr_t)_fdata)
++      extern int __data_start[];
++#     define DATASTART ((ptr_t)__data_start)
+       extern int _end[];
+ #     define DATAEND ((ptr_t)(&_end))
+ #     define DYNAMIC_LOADING
+@@ -2221,6 +2226,19 @@
+ #     define ELF_CLASS ELFCLASS64
+ #     define DYNAMIC_LOADING
+ #   endif
 +#   ifdef OPENBSD
 +#     define OS_TYPE "OPENBSD"
 +#     ifndef GC_OPENBSD_THREADS
@@ -63,6 +63,7 @@ $OpenBSD: patch-include_private_gcconfig_h,v 1.22 2017/04/15 14:02:46 naddy Exp 
 +      extern int _end[];
 +#     define DATAEND ((ptr_t)(&_end))
 +#     define DYNAMIC_LOADING
- #   endif
++#   endif
  #   ifdef NOSYS
        /* __data_start is usually defined in the target linker script.   */
+       extern int __data_start[];

@@ -1,16 +1,15 @@
-# $OpenBSD: Makefile,v 1.70 2018/12/30 17:08:09 pascal Exp $
+# $OpenBSD: Makefile,v 1.71 2019/05/14 00:08:00 ivmai Exp $
 
 COMMENT-main=	garbage collection and memory leak detection for C and C++
-COMMENT-atomic=	access to hardware provided atomic memory operations
+COMMENT-atomic=	access to hardware-provided atomic memory operations
 
-VERSION=	7.6.0
-LIBAO_VERSION=	7.6.6
+VERSION=	7.6.12
+LIBAO_VERSION=	7.6.10
 
 DISTNAME=	gc-${VERSION}
 
 PKGNAME-atomic=	libatomic_ops-${LIBAO_VERSION}
 PKGNAME-main=	boehm-gc-${VERSION}
-REVISION-main=	2
 
 DISTFILES=	${DISTNAME}${EXTRACT_SUFX} \
 		libatomic_ops-${LIBAO_VERSION}${EXTRACT_SUFX}
@@ -60,6 +59,5 @@ pre-build:
 post-install:
 	@cd ${WRKBUILD}/libatomic_ops && ${SETENV} ${MAKE_ENV} \
 		${MAKE_PROGRAM} ${ALL_FAKE_FLAGS} install
-	${INSTALL_DATA} ${WRKSRC}/doc/gc.man ${PREFIX}/man/man3/gc.3
 
 .include <bsd.port.mk>
